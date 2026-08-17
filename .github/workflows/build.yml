@@ -1,0 +1,33 @@
+name: build
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install baseline and compile node-pty on arm64
+        run: ./build/build.sh "${GITHUB_REF_NAME#v}" /tmp/dsh-stage
+
+      - name: Verify runtime boots (pty.node + dsh web)
+        run: ./build/verify.sh /tmp/dsh-stage
+
+      - name: Package tarball + checksums
+        run: ./build/package.sh /tmp/dsh-stage dist "${GITHUB_REF_NAME#v}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsh-arm64
+          path: dist/
+          retention-days: 7
