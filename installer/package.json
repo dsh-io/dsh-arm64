@@ -1,0 +1,10 @@
+{
+  "name": "@dsh-io/dsh-arm64-install",
+  "version": "0.1.0",
+  "description": "Thin installer for the official dsh-arm64 deployment package (DeepSeek Harness for Linux aarch64). Downloads, verifies sha256 and unpacks the GitHub Release artifact.",
+  "type": "module",
+  "bin": { "dsh-arm64-install": "./bin/dsh-arm64-install.mjs" },
+  "files": ["bin"],
+  "engines": { "node": ">=18" },
+  "license": "MIT"
+}
