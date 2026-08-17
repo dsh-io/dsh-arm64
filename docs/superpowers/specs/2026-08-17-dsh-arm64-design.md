@@ -32,7 +32,6 @@ dsh-arm64/
 │   ├── package.json
 │   └── bin/dsh-arm64-install.mjs
 ├── install.sh                    # zero-dep fallback entry (download → verify → unpack → configure)
-├── profiles/                     # headless/web profile config templates
 └── README.md
 ```
 
@@ -78,6 +77,8 @@ target dsh runtime still requires Node ≥ 22).
 - Linux aarch64 (Ubuntu/Debian family) only for v0.1.0; Termux and Docker images are follow-ups
 - Independent repo; no dependency on dsh-dev / dsh-plugin-skill / identity-sentinel
 - No npm distribution of binaries — artifacts exclusively on GitHub Releases
+- No hand-copied dsh profile config templates: first-run configuration is driven by dsh's own
+  built-in initialization (the harness config schema is upstream-owned and not re-specified here)
 
 ## Error handling
 
