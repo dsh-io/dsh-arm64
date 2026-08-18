@@ -20,7 +20,9 @@ tar -xJf "${STAGE}" -C "${WORK}/rootfs"
 [ -f "${WORK}/rootfs/root/.dsh-arm64/node_modules/@deepseek-ai/dsh/lib/bin.js" ] \
   || { echo "!! dsh missing" >&2; exit 1; }
 
-PROOT_ARGS=(-0 -r "${WORK}/rootfs" -b /dev:/dev -b /proc:/proc -b /sys:/sys -w /root --kill-on-exit)
+# NOTE: no --kill-on-exit — Ubuntu's proot 5.4 lacks it; the app ships a
+# newer static build where it exists.
+PROOT_ARGS=(-0 -r "${WORK}/rootfs" -b /dev:/dev -b /proc:/proc -b /sys:/sys -w /root)
 
 echo "==> agent shell smoke:"
 proot "${PROOT_ARGS[@]}" -- /usr/bin/env -i HOME=/root \
