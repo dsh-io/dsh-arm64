@@ -105,7 +105,11 @@ custom_channels:
 EOF
 mkdir -p rootfs/root/projects
 
-# ---- 6. package rootfs.tar.xz + sha256 ----
+# ---- 6. drop device nodes (proot binds the host /dev; device entries
+#           break unprivileged tar extraction and Android-side unpack) ----
+rm -rf rootfs/dev && mkdir -p rootfs/dev
+
+# ---- 7. package rootfs.tar.xz + sha256 ----
 tar -cJf "dsh-arm64-rootfs-${BASELINE}.tar.xz" -C rootfs .
 sha256sum "dsh-arm64-rootfs-${BASELINE}.tar.xz" > rootfs.sha256sums
 sha256sum -c rootfs.sha256sums
