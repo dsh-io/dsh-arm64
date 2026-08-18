@@ -49,7 +49,7 @@ jobs:
           sudo ./build/build-rootfs.sh "$VER" /tmp/dsh-rootfs
           sudo chown -R "$(id -u)" /tmp/dsh-rootfs
       - name: Verify rootfs (shell smoke + dsh web boot)
-        run: ./build/verify-rootfs.sh /tmp/dsh-rootfs/dsh-arm64-rootfs-"${VER}".tar.xz
+        run: sudo ./build/verify-rootfs.sh /tmp/dsh-rootfs/dsh-arm64-rootfs-"${VER}".tar.xz
       - name: Generate update manifest
         run: |
           SHA=$(cut -d' ' -f1 /tmp/dsh-rootfs/rootfs.sha256sums)
