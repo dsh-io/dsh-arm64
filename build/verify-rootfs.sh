@@ -20,17 +20,17 @@ tar -xJf "${STAGE}" -C "${WORK}/rootfs"
 [ -f "${WORK}/rootfs/root/.dsh-arm64/node_modules/@deepseek-ai/dsh/lib/bin.js" ] \
   || { echo "!! dsh missing" >&2; exit 1; }
 
-# NOTE: no --kill-on-exit — Ubuntu's proot 5.4 lacks it; the app ships a
-# newer static build where it exists.
+# NOTE: no --kill-on-exit / no `--` separator — Ubuntu's proot 5.4 lacks
+# both; the app ships a newer static build where they exist.
 PROOT_ARGS=(-0 -r "${WORK}/rootfs" -b /dev:/dev -b /proc:/proc -b /sys:/sys -w /root)
 
 echo "==> agent shell smoke:"
-proot "${PROOT_ARGS[@]}" -- /usr/bin/env -i HOME=/root \
+proot "${PROOT_ARGS[@]}" /usr/bin/env -i HOME=/root \
   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin TERM=xterm-256color \
   bash -c 'echo SHELL_OK; id -u; node --version; which node bash' || { echo "!! shell smoke FAILED" >&2; exit 1; }
 
 echo "==> booting dsh web (60s window)..."
-timeout 60 proot "${PROOT_ARGS[@]}" -- /usr/bin/env -i HOME=/root \
+timeout 60 proot "${PROOT_ARGS[@]}" /usr/bin/env -i HOME=/root \
   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin TERM=xterm-256color \
   DSH_HOME=/root/.dsh \
   node --expose-internals /root/.dsh-arm64/node_modules/@deepseek-ai/dsh/lib/bin.js web \
