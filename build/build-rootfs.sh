@@ -45,7 +45,7 @@ rootfs/usr/local/bin/node --version | grep -q "v${NODE_VERSION}" \
 curl -fsSL --retry 3 --retry-all-errors \
   -o work/overlay.tar.gz "https://github.com/dsh-io/dsh-arm64/releases/download/v${BASELINE}/dsh-arm64-${BASELINE}.tar.gz"
 mkdir -p rootfs/root/.dsh-arm64
-tar -xzf work/overlay.tar.gz -C rootfs/root/.dsh-arm64 --strip-components=1 \
+tar -xzf work/overlay.tar.gz -C rootfs/root/.dsh-arm64 \
   --exclude='install.sh'
 [ -f rootfs/root/.dsh-arm64/node_modules/@deepseek-ai/dsh/lib/bin.js ] \
   || { echo "!! overlay missing dsh bin.js" >&2; exit 1; }
