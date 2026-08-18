@@ -30,3 +30,36 @@ jobs:
           name: dsh-arm64
           path: dist/
           retention-days: 7
+
+  rootfs:
+    runs-on: ubuntu-24.04-arm
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install proot (host verify tool)
+        run: sudo apt-get update && sudo apt-get install -y proot
+      - name: Build rootfs artifact
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          [ "$VER" = "$GITHUB_REF_NAME" ] && VER=0.1.0-rc.6
+          echo "VER=$VER" >> "$GITHUB_ENV"
+          sudo ./build/build-rootfs.sh "$VER" /tmp/dsh-rootfs
+          sudo chown -R "$(id -u)" /tmp/dsh-rootfs
+      - name: Verify rootfs (shell smoke + dsh web boot)
+        run: ./build/verify-rootfs.sh /tmp/dsh-rootfs/dsh-arm64-rootfs-"${VER}".tar.xz
+      - name: Generate update manifest
+        run: |
+          SHA=$(cut -d' ' -f1 /tmp/dsh-rootfs/rootfs.sha256sums)
+          SIZE=$(stat -c%s /tmp/dsh-rootfs/dsh-arm64-rootfs-"${VER}".tar.xz)
+          URL="https://github.com/dsh-io/dsh-arm64/releases/download/${GITHUB_REF_NAME}/dsh-arm64-rootfs-${VER}.tar.xz"
+          printf '{"url":"%s","sha256":"%s","size":%s}\n' "$URL" "$SHA" "$SIZE" > /tmp/dsh-rootfs/manifest.json
+          cat /tmp/dsh-rootfs/manifest.json
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsh-arm64-rootfs
+          path: /tmp/dsh-rootfs/
+          retention-days: 7
