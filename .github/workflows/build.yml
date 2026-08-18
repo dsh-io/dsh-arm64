@@ -41,11 +41,25 @@ jobs:
           node-version: 22
       - name: Install debootstrap (build tool)
         run: sudo apt-get update && sudo apt-get install -y debootstrap
-      - name: Build rootfs artifact
+
+      - name: Resolve version
         run: |
           VER="${GITHUB_REF_NAME#v}"
           [ "$VER" = "$GITHUB_REF_NAME" ] && VER=0.1.0-rc.6
           echo "VER=$VER" >> "$GITHUB_ENV"
+
+      - name: Cache trimmed rootfs stage
+        uses: actions/cache@v4
+        with:
+          path: /tmp/dsh-rootfs/rootfs-cache.tar.gz
+          key: rootfs-${{ env.VER }}-${{ hashFiles('build/build-rootfs.sh') }}
+          restore-keys: |
+            rootfs-${{ env.VER }}-
+            rootfs-
+
+      - name: Build rootfs artifact
+        run: |
+          mkdir -p /tmp/dsh-rootfs
           sudo ./build/build-rootfs.sh "$VER" /tmp/dsh-rootfs
           sudo chown -R "$(id -u)" /tmp/dsh-rootfs
       - name: Verify rootfs (shell smoke + dsh web boot)
