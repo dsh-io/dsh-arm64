@@ -80,10 +80,13 @@ jobs:
           merge-multiple: true
 
       - name: Publish to GitHub release (dispatch/tag)
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           cd /tmp/dsh-rootfs
+          ls -la overlay/ || true
           URL="https://github.com/dsh-io/dsh-arm64/releases/download/v${VER}/dsh-arm64-rootfs-${VER}.tar.xz"
           python3 - "$URL" <<'EOF'
           import json, sys
@@ -92,8 +95,11 @@ jobs:
           json.dump(m, open('manifest.json', 'w'))
           EOF
           cat manifest.json
-          ASSETS=(dsh-arm64-rootfs-${VER}.tar.xz rootfs.sha256sums manifest.json
-                  overlay/dsh-arm64-${VER}.tar.gz overlay/sha256sums.txt)
+          ASSETS=()
+          for f in "dsh-arm64-rootfs-${VER}.tar.xz" rootfs.sha256sums manifest.json \
+                   "overlay/dsh-arm64-${VER}.tar.gz" overlay/sha256sums.txt; do
+            [ -f "$f" ] && ASSETS+=("$f")
+          done
           if gh release view "v${VER}" >/dev/null 2>&1; then
             gh release upload "v${VER}" "${ASSETS[@]}" --clobber
           else
