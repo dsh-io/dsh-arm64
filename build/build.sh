@@ -21,6 +21,18 @@ if [ "$(uname -m)" != "aarch64" ] && [ "$(uname -m)" != "arm64" ]; then
 fi
 
 echo "==> dsh-arm64 build: baseline dsh@${BASELINE} into ${STAGE}"
+
+# CI cache fast path: a complete stage skips install + node-pty compile.
+if [ -f "${STAGE}/node_modules/@deepseek-ai/dsh/lib/bin.js" ] \
+   && [ -f "${STAGE}/node_modules/@deepseek-ai/dsh/package.json" ] \
+   && [ -n "$(find "${STAGE}/node_modules/node-pty" -name 'pty.node' 2>/dev/null | head -1)" ]; then
+  echo "==> stage cache hit: skipping install + compile"
+  cd "${STAGE}"
+  node -e "require('node-pty'); console.log('==> pty.node loads OK')"
+  echo "==> build OK"
+  exit 0
+fi
+
 rm -rf "${STAGE}"
 mkdir -p "${STAGE}"
 cd "${STAGE}"
