@@ -141,4 +141,7 @@ tar -cJf "dsh-arm64-rootfs-${BASELINE}.tar.xz" -C rootfs .
 sha256sum "dsh-arm64-rootfs-${BASELINE}.tar.xz" > rootfs.sha256sums
 sha256sum -c rootfs.sha256sums
 du -h "dsh-arm64-rootfs-${BASELINE}.tar.xz"
+
+# ---- 9. drop the unpacked tree (only artifacts + cache stay in STAGE) ----
+rm -rf rootfs work
 echo "==> rootfs build OK"

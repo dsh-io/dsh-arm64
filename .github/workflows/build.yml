@@ -75,5 +75,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dsh-arm64-rootfs
-          path: /tmp/dsh-rootfs/
+          path: |
+            /tmp/dsh-rootfs/dsh-arm64-rootfs-*.tar.xz
+            /tmp/dsh-rootfs/rootfs.sha256sums
+            /tmp/dsh-rootfs/manifest.json
           retention-days: 7
