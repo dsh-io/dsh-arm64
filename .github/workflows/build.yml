@@ -71,6 +71,35 @@ jobs:
           URL="https://github.com/dsh-io/dsh-arm64/releases/download/${GITHUB_REF_NAME}/dsh-arm64-rootfs-${VER}.tar.xz"
           printf '{"url":"%s","sha256":"%s","size":%s}\n' "$URL" "$SHA" "$SIZE" > /tmp/dsh-rootfs/manifest.json
           cat /tmp/dsh-rootfs/manifest.json
+
+      - name: Fetch overlay tarball from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: dsh-arm64
+          path: /tmp/dsh-rootfs/overlay
+
+      - name: Publish to GitHub release (dispatch/tag)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd /tmp/dsh-rootfs
+          URL="https://github.com/dsh-io/dsh-arm64/releases/download/v${VER}/dsh-arm64-rootfs-${VER}.tar.xz"
+          python3 - "$URL" <<'EOF'
+          import json, sys
+          m = json.load(open('manifest.json'))
+          m['url'] = sys.argv[1]
+          json.dump(m, open('manifest.json', 'w'))
+          EOF
+          cat manifest.json
+          ASSETS=(dsh-arm64-rootfs-${VER}.tar.xz rootfs.sha256sums manifest.json
+                  overlay/dsh-arm64-${VER}.tar.gz overlay/sha256sums.txt)
+          if gh release view "v${VER}" >/dev/null 2>&1; then
+            gh release upload "v${VER}" "${ASSETS[@]}" --clobber
+          else
+            gh release create "v${VER}" "${ASSETS[@]}" \
+              --title "dsh-arm64 ${VER}" --notes "overlay + bookworm rootfs"
+          fi
+          gh release view "v${VER}" --json assets --jq '.assets[].name'
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
