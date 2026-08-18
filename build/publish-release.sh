@@ -5,8 +5,15 @@ set -euo pipefail
 
 STAGE="${1:?usage: publish-release.sh <stage-dir> <version>}"
 VER="${2:?version required}"
+export GH_REPO=dsh-io/dsh-arm64
 
 cd "${STAGE}"
+
+# download-artifact nesting varies by action version; flatten whatever we got.
+if [ -d overlay ]; then
+  find overlay -type f -name '*.tar.gz' -exec cp -f {} overlay/ \; 2>/dev/null || true
+  find overlay -type f -name 'sha256sums.txt' -exec cp -f {} overlay/ \; 2>/dev/null || true
+fi
 
 URL="https://github.com/dsh-io/dsh-arm64/releases/download/v${VER}/dsh-arm64-rootfs-${VER}.tar.xz"
 python3 - "$URL" <<'EOF'
