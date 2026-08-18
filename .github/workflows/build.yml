@@ -39,8 +39,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install proot + debootstrap (host verify + build tools)
-        run: sudo apt-get update && sudo apt-get install -y proot debootstrap
+      - name: Install debootstrap (build tool)
+        run: sudo apt-get update && sudo apt-get install -y debootstrap
       - name: Build rootfs artifact
         run: |
           VER="${GITHUB_REF_NAME#v}"
