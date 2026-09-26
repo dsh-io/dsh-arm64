@@ -57,7 +57,7 @@ jobs:
       - name: Resolve version
         run: |
           VER="${GITHUB_REF_NAME#v}"
-          [ "$VER" = "$GITHUB_REF_NAME" ] && VER=0.1.0-rc.6
+          [ "$VER" = "$GITHUB_REF_NAME" ] && VER=0.1.7-rc.2
           echo "VER=$VER" >> "$GITHUB_ENV"
 
       - name: Cache trimmed rootfs stage

@@ -15,7 +15,7 @@ const cwd = new URL('.', import.meta.url).pathname
 const dir = mkdtempSync(join(tmpdir(), 'dsh-install-test-'))
 const payload = join(dir, 'payload')
 mkdirSync(payload)
-const tarball = join(dir, 'dsh-arm64-0.1.0-rc.6.tar.gz')
+const tarball = join(dir, 'dsh-arm64-0.1.7-rc.2.tar.gz')
 writeFileSync(join(payload, 'hello.txt'), 'hello-arm64')
 spawnSync('tar', ['czf', tarball, '-C', payload, '.'])
 const goodSha = createHash('sha256').update(readFileSync(tarball)).digest('hex')
@@ -24,21 +24,21 @@ let root = ''
 let api = ''
 const server = createServer((req, res) => {
   const asset = (sha) => [
-    { name: 'dsh-arm64-0.1.0-rc.6.tar.gz', size: 1, browser_download_url: `${root}/dl/dsh-arm64-0.1.0-rc.6.tar.gz` },
+    { name: 'dsh-arm64-0.1.7-rc.2.tar.gz', size: 1, browser_download_url: `${root}/dl/dsh-arm64-0.1.7-rc.2.tar.gz` },
     { name: 'sha256sums.txt', size: 1, browser_download_url: `${root}/dl/sha256sums-${sha}.txt` },
   ]
-  if (req.url === '/releases/latest' || req.url === '/releases/tags/0.1.0-rc.6') {
+  if (req.url === '/releases/latest' || req.url === '/releases/tags/0.1.7-rc.2') {
     res.setHeader('content-type', 'application/json')
-    res.end(JSON.stringify({ tag_name: 'v0.1.0-rc.6', assets: asset(goodSha) }))
+    res.end(JSON.stringify({ tag_name: 'v0.1.7-rc.2', assets: asset(goodSha) }))
   } else if (req.url === '/releases/tags/bad') {
     res.setHeader('content-type', 'application/json')
-    res.end(JSON.stringify({ tag_name: 'v0.1.0-rc.6', assets: asset('0'.repeat(64)) }))
-  } else if (req.url === '/dl/dsh-arm64-0.1.0-rc.6.tar.gz') {
+    res.end(JSON.stringify({ tag_name: 'v0.1.7-rc.2', assets: asset('0'.repeat(64)) }))
+  } else if (req.url === '/dl/dsh-arm64-0.1.7-rc.2.tar.gz') {
     res.end(readFileSync(tarball))
   } else if (req.url === `/dl/sha256sums-${goodSha}.txt`) {
-    res.end(`${goodSha}  dsh-arm64-0.1.0-rc.6.tar.gz\n`)
+    res.end(`${goodSha}  dsh-arm64-0.1.7-rc.2.tar.gz\n`)
   } else if (req.url === `/dl/sha256sums-${'0'.repeat(64)}.txt`) {
-    res.end(`${'0'.repeat(64)}  dsh-arm64-0.1.0-rc.6.tar.gz\n`)
+    res.end(`${'0'.repeat(64)}  dsh-arm64-0.1.7-rc.2.tar.gz\n`)
   } else {
     res.statusCode = 404
     res.end()
@@ -62,7 +62,7 @@ async function run(extra) {
 }
 
 test('--print-plan does not download and exits 0', async () => {
-  const r = await run(['--print-plan', '--version', '0.1.0-rc.6'])
+  const r = await run(['--print-plan', '--version', '0.1.7-rc.2'])
   assert.equal(r.status, 0, r.stderr)
   assert.match(r.stdout, /0\.1\.0-rc\.6/)
   assert.match(r.stdout, /\.dsh-arm64/)
@@ -70,7 +70,7 @@ test('--print-plan does not download and exits 0', async () => {
 
 test('full install: download, verify sha256, unpack', async () => {
   const dest = join(dir, 'installed')
-  const r = await run(['--dir', dest, '--version', '0.1.0-rc.6'])
+  const r = await run(['--dir', dest, '--version', '0.1.7-rc.2'])
   assert.equal(r.status, 0, r.stderr)
   assert.ok(existsSync(join(dest, 'hello.txt')), 'payload unpacked')
   assert.equal(readFileSync(join(dest, 'hello.txt'), 'utf8'), 'hello-arm64')

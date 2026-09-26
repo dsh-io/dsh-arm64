@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASELINE="${1:-0.1.0-rc.6}"
+BASELINE="${1:-0.1.7-rc.2}"
 STAGE="${2:-/tmp/dsh-arm64-rootfs-stage}"
-NODE_VERSION="${3:-22.16.0}"
+NODE_VERSION="${3:-22.23.3}"
 NODE_MIRROR="${NODE_MIRROR:-https://npmmirror.com/mirrors/node}"
 
 if [ "$(uname -m)" != "aarch64" ] && [ "$(uname -m)" != "arm64" ]; then

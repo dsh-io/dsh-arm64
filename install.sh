@@ -8,7 +8,7 @@ REPO="dsh-io/dsh-arm64"
 usage() {
   cat <<'EOF'
 Usage: install.sh [--version VERSION] [--dir DIR]
-  --version VERSION  Pin a specific release (e.g. 0.1.0-rc.6); default: latest
+  --version VERSION  Pin a specific release (e.g. 0.1.7-rc.2); default: latest
   --dir DIR          Install directory; default: ~/.dsh-arm64
   --help             Show this help
 EOF
@@ -31,7 +31,7 @@ fi
 
 NODE_V="$(node -v 2>/dev/null || true)"
 if [ -z "${NODE_V}" ]; then
-  echo "!! Node.js >= 22 is required by the dsh runtime. Install Node first." >&2
+  echo "!! Node.js >= 22.19 is required by the dsh runtime. Install Node first." >&2
   exit 2
 fi
 

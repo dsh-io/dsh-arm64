@@ -39,9 +39,9 @@ echo "==> booting dsh web (60s window)..."
 timeout 60 chroot "${WORK}/rootfs" /usr/bin/env -i "${CHROOT_ENV[@]}" DSH_HOME=/root/.dsh \
   node --expose-internals /root/.dsh-arm64/node_modules/@deepseek-ai/dsh/lib/bin.js web \
   > "${WORK}/boot.log" 2>&1 || true
-if grep -qi "error\|pty.node" "${WORK}/boot.log"; then
+if grep -qi "error\|pty.node\|koffi" "${WORK}/boot.log"; then
   echo "!! boot errors:" >&2
-  grep -i "error\|pty.node" "${WORK}/boot.log" >&2
+  grep -i "error\|pty.node\|koffi" "${WORK}/boot.log" >&2
   exit 1
 fi
 echo "==> verify OK: shell smoke + dsh web boot clean"
